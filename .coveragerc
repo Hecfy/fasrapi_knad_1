@@ -1,0 +1,11 @@
+[run]
+source =
+    auth
+    database
+    main
+    models
+    schemas
+
+[report]
+show_missing = True
+skip_empty = True
