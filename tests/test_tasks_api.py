@@ -3,6 +3,30 @@ from datetime import datetime, timedelta, timezone
 import main
 
 
+def test_index_page_and_healthcheck_are_available(client):
+    index_response = client.get("/")
+    health_response = client.get("/healthz")
+
+    assert index_response.status_code == 200
+    assert "Task Manager" in index_response.text
+    assert "Веб-интерфейс для демонстрации" not in index_response.text
+    assert health_response.status_code == 200
+    assert health_response.json() == {"status": "ok"}
+
+
+def test_ui_pages_are_available(client):
+    register_response = client.get("/register")
+    login_response = client.get("/login")
+    tasks_response = client.get("/tasks-ui")
+
+    assert register_response.status_code == 200
+    assert "Регистрация" in register_response.text
+    assert login_response.status_code == 200
+    assert "Вход" in login_response.text
+    assert tasks_response.status_code == 200
+    assert "Сортировка" in tasks_response.text
+
+
 def test_create_task_requires_authentication(client):
     response = client.post(
         "/tasks",

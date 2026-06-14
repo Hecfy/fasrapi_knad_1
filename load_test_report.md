@@ -2,17 +2,17 @@
 
 ## Goal
 
-Проверить поведение `Task Manager API` под нагрузкой на `PostgreSQL`, а не на `SQLite`, потому что:
+Проверить поведение `Task Manager API` под нагрузкой на `MySQL`, поднятой в отдельном Docker-контейнере, а не на `SQLite`, потому что:
 
 - SQLite плохо подходит для конкурентной записи и realistic load profile
-- PostgreSQL ближе к ожидаемому production-сценарию
+- MySQL работает как отдельный сервер БД и соответствует Docker-заданию
 - кэширование `GET /tasks` имеет смысл оценивать на серверной БД, а не на файловой
 
 ## Environment
 
 - Application: FastAPI `Task Manager API`
 - Load tool: `Locust`
-- Database target: `PostgreSQL 16`
+- Database target: `MySQL 8.4`
 - Docker bootstrap: `docker-compose.yml`
 - Scenario file: `locustfile.py`
 
@@ -30,9 +30,8 @@
 ## Suggested Run Commands
 
 ```bash
-docker compose up -d postgres
-export DATABASE_URL=postgresql+psycopg://task_manager:task_manager@localhost:5432/task_manager
-uvicorn main:app --host 0.0.0.0 --port 8000
+cp .env.example .env
+docker compose up --build
 locust -f locustfile.py --host http://127.0.0.1:8000 --headless -u 20 -r 5 -t 2m
 ```
 
@@ -52,9 +51,9 @@ locust -f locustfile.py --host http://127.0.0.1:8000 --headless -u 20 -r 5 -t 2m
 
 ## Result Notes
 
-В текущем контейнере разработки Docker и локальный PostgreSQL не установлены, поэтому здесь подготовлены:
+В текущем контейнере разработки Docker не установлен, поэтому здесь подготовлены:
 
-- воспроизводимая Postgres-конфигурация
+- воспроизводимая Docker Compose-конфигурация с MySQL
 - готовый Locust-сценарий
 - команды запуска для реального прогона
 

@@ -1,4 +1,5 @@
 import os
+import time
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
@@ -21,7 +22,15 @@ Base = declarative_base()
 def init_db() -> None:
     import models  # noqa: F401
 
-    Base.metadata.create_all(bind=engine)
+    last_error = None
+    for _ in range(10):
+        try:
+            Base.metadata.create_all(bind=engine)
+            return
+        except Exception as error:
+            last_error = error
+            time.sleep(2)
+    raise last_error
 
 
 def get_db():
